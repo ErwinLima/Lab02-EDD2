@@ -185,25 +185,23 @@
             temporal.Value = item;
         }
 
-        public void QueryResults(Nodo<T> temporal, T item, Delegate condition1, List<T> Results) //Procedimiento que llena una lista con todos los registros que sean iguales al elemento ingresado
+        public T Search(T item, Delegate condition)
         {
-            if (temporal == null)
+            Nodo<T>? temporal = Root;
+            while (temporal != null && (int)condition.DynamicInvoke(item, temporal!.Value) != 0)
             {
-                return;
+                if ((int)condition.DynamicInvoke(item, temporal.Value) > 0)
+                {
+                    temporal = temporal.Right;
+                }
+                else
+                {
+                    temporal = temporal.Left;
+                }
             }
-            if (temporal.Left != null)
-            {
-                QueryResults(temporal.Left, item, condition1, Results);
-            }
-            if ((int)condition1.DynamicInvoke(item, temporal.Value) == 0)
-            {
-                Results.Add(temporal.Value);
-            }
-            if (temporal.Right != null)
-            {
-                QueryResults(temporal.Right, item, condition1, Results);
-            }
+            return temporal!.Value;
         }
+
         private Nodo<T> ReBalance(Nodo<T> nodo)
         {
             SetHeight(nodo); //Se actualiza la altura del nodo
